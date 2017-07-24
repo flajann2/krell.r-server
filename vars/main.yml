@@ -1,0 +1,15 @@
+---
+r_touchme: /tmp/r-is-built
+r_pid: /var/run/rserve.pid
+r_log: /var/log/feingold/rserve.log
+r_install: /data
+r_exec_path: /usr/local/bin/R
+r_rscript_common: /RScript
+r_working_dir: "{{r_install}}/{{r_rscript_common}}/connections"
+r_rscript_location: "{{r_install}}/RScript"
+r_rpkg: "R-{{r_version}}.tar.gz"
+r_url: "https://cran.r-project.org/src/base/R-3/{{r_rpkg}}"
+r_rserv_url: "http://www.rforge.net/Rserve/snapshot/{{r_rserv}}"
+r_tar: "{{r_install}}/{{r_rpkg}}"
+r_path: "{{r_install}}/R"
+r_installed: "{{r_install}}/R-{{r_version}}"

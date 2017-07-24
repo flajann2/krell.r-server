@@ -1,0 +1,23 @@
+---
+- block:
+  - name: build | build R
+    shell: "{{item}}"
+    args:
+      chdir: "{{r_path}}"
+      creates: "{{r_touchme}}"
+    with_items:
+      - apt-get -y build-dep r-base >/tmp/dep-apt
+      - ./configure --enable-R-shlib --without-x CPICFLAGS="-fPIC"
+      - make clean
+      - make
+      - make install
+      - make install-info
+      - R CMD INSTALL "{{r_rserv}}"
+      - touch "{{r_touchme}}"
+
+  - name: build | install the rserve script but dont start it
+    service:
+      name: rserve
+      enabled: yes
+      state: stopped  
+  become: true

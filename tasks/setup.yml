@@ -1,0 +1,59 @@
+---
+- block:
+  - name: setup | download R
+    unarchive:
+      copy: no
+      src: "{{r_url}}"
+      dest: "{{r_install}}"
+      mode: 0644
+      owner: ubuntu
+
+  - name: setup | move the R source to its living area
+    command: /bin/mv {{r_installed}} {{r_path}}
+    args:
+      creates: "{{r_path}}"
+
+  - file: 
+      path: "{{r_path}}/configure"
+      mode: 0755
+
+  - file: 
+      path: "{{r_path}}"
+      recurse: yes
+      owner: ubuntu
+
+  - name: setup | download Rserv
+    get_url: 
+      url: "{{r_rserv_url}}" 
+      dest: "{{r_path}}"
+
+  - template:
+      src: Rserv.conf.j2
+      dest: /etc/Rserv.conf
+      owner: root
+      group: root
+      mode: 0644
+
+  - template:
+      src: "{{item}}.initd.j2"
+      dest: "/etc/init.d/{{item}}"
+      owner: root
+      group: root
+      mode: 0755
+    with_items:
+      - rserve
+
+  - name: setup | create an area for the R scripts
+    file:
+      path: "{{item}}"
+      state: directory
+      owner: ubuntu
+    with_items:
+      - "{{r_rscript_location}}"
+      - "{{r_working_dir}}"
+
+  - name: setup | create a common link to the R script location
+    file: 
+      path: "{{r_rscript_common}}"
+      src: "{{r_rscript_location}}"
+      state: link

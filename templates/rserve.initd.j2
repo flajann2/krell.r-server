@@ -1,0 +1,88 @@
+#! /bin/sh
+### BEGIN INIT INFO
+# Provides:          rserve
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Manages R daemon 
+# Description:       Rserver deamon to handle Rserve tasks.
+#                    R packages may then be run remotely.
+### END INIT INFO
+
+. /lib/lsb/init-functions
+
+## Variables
+LOGFILE="{{r_log}}"
+PIDFILE="{{r_pid}}"
+CONFIGFILE="/etc/Rserv.conf"
+DAEMON="/usr/local/bin/R"
+RSERVE="CMD Rserve --RS-workdir {{r_working_dir}} --RS-encoding utf8"
+JOB=Rserve
+
+test -f $CONFIGFILE || exit 0
+test -x $DAEMON || exit 0
+
+stop_rserve()
+{
+    #start-stop-daemon --stop --quiet --oknodo --pidfile $PIDFILE
+    killall Rserve 2>&1 >/dev/null || true
+    rm $PIDFILE 2>&1 > /dev/null || true
+}
+
+start_rserve()
+{
+    start-stop-daemon -p -R 60 --start -m --oknodo --pidfile ${PIDFILE} --exec $DAEMON -- $RSERVE;
+}
+
+case "$1" in
+    start)
+	      log_daemon_msg "Starting Rserve"
+	      if start_rserve ; then
+	          log_end_msg 0
+	      else
+	          log_end_msg 1
+	      fi
+	      ;;
+    stop)
+	      log_daemon_msg "Stopping Rserve"
+	      if stop_rserve; then
+	          log_end_msg 0
+	      else
+	          log_end_msg 1
+	      fi
+	      ;;
+    restart)
+        log_daemon_msg "Stopping Rserve for restart"
+        # regenerate exim4.conf
+        stop_rserve
+        log_end_msg 0
+        sleep 2
+        log_daemon_msg "Restarting Rserve"
+        start_rserve
+        log_end_msg 0
+        ;;
+    status)
+         if [ ! -f $PIDFILE ]; then
+             # Since now we creating the pid correctly, not having the pid file is an indication whether the Rserve is running or not
+             echo "Rserve is not running.."
+         else
+             # Because of daemon is forking, pidfile is not updated with the right ps id for status/stop commands
+             sudo echo $(ps fax |grep -i rscript/conn |grep -v grep | awk -F " " '{print $1}') > $PIDFILE
+             # This is the actual check is the PID is alive and healthy
+             sudo kill -0 $(cat $PIDFILE)
+             if [ $? -ne 0 ]; then
+                 echo "Rserve is not running.."
+             else
+                 echo "Rserve is running.."
+             fi
+        
+          fi
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart|status}"
+        exit 1
+        ;;
+esac
+
+exit 0

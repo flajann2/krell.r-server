@@ -1,0 +1,14 @@
+---
+- block:
+  - name: repo | install needed dependencies
+    apt: 
+      name: "{{item}}"
+      state: present
+      update_cache: yes
+    with_items:
+      - r-base
+      - libssl-dev
+      - gpdftext
+      - texinfo
+      - texi2html
+      - libcurl4-openssl-dev

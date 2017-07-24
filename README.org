@@ -1,0 +1,26 @@
+* RServer
+  We need to put many of the setup details in this role,
+  since we are doing config files templates and the like.
+** Preliminaries
+   The R software is donloaded, compiled,
+   and installed.
+   
+   The Rserve software is also downloaded 
+   and installed.
+
+   A deamon script is created to launch Rserve.
+** Notes
+*** Touch file
+    r_touchme specifies a touch file in
+    the /tmp directory that is created pending
+    successful cretion of Rserv. If the
+    instance is rebooted, this file may be
+    deleted and thus the Rserv will be rebuilt
+    needlessly.
+
+    This should not be a major concern as these servers
+    will almost never be restarted. I will simply add
+    time to the run of this role if it's the case.
+
+** TODO Problem with deamon script stopping service.
+** TODO Need to devise a Unit Test approach for R scripts

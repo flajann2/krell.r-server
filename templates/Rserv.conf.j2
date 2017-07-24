@@ -1,0 +1,25 @@
+workdir /tmp/Rserv
+#pwdfile <file> [none=disabled]
+remote enable
+auth disable
+plaintext disable
+fileio enable
+interactive yes
+
+#socket <socket> [none=disabled]
+port 6311
+maxinbuf 2621440
+maxsendbuf 0
+
+#uid <uid> [none]
+#gid <gid> [none]
+#su now|server|client [none] (since 0.6-1)
+
+#source <file>
+#eval <expressions>
+
+#chroot <directory> [none]
+#sockmod <mode> [0=default]
+#umask <mask> [0]
+
+encoding utf8
